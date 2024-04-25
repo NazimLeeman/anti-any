@@ -46,24 +46,41 @@ import locationIcon from "@iconify/icons-mdi/map-marker";
 import Modal from "react-modal";
 import "./MapWithMarker.css";
 
-const MapWithMarker = () => {
-    const defaultLocation = {
-        address: "1600 Amphitheatre Parkway, Mountain View, California",
-        lat: 37.42216,
-        lng: -122.08427,
-      };
-      
-      useEffect(() => {
-          Modal.setAppElement("#root"); 
-        }, []);
-        
-  const [location, setLocation] = useState(defaultLocation);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [newLocation, setNewLocation] = useState({
-    address: "",
-    lat: "",
-    lng: "",
-  });
+const MapWithMarker = () => {  
+    
+    const [defaultLocation, setDefaultLocation] = useState({ });      
+    const [location, setLocation] = useState(defaultLocation);
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [newLocation, setNewLocation] = useState({
+        address: "",
+        lat: "",
+        lng: "",
+    });
+    
+    useEffect(() => {
+        Modal.setAppElement("#root"); 
+      }, []);
+    
+  useEffect(() => {
+    const fetchDefaultLocation = () => {
+      const storedLocation = localStorage.getItem('savedLocation');
+      if (storedLocation) {
+        console.log(JSON.parse(storedLocation));
+        setDefaultLocation(JSON.parse(storedLocation));
+      } else {
+        setDefaultLocation({
+          address: "1600 Amphitheatre Parkway, Mountain View, California",
+          lat: 37.42216,
+          lng: -122.08427,
+        });
+      }
+    };
+    fetchDefaultLocation();
+  }, []);
+
+  useEffect(() => {
+    setLocation(defaultLocation);
+  }, [defaultLocation]);
 
   const openModal = () => {
     setModalIsOpen(true);
@@ -86,6 +103,13 @@ const MapWithMarker = () => {
       lat: parseFloat(lat),
       lng: parseFloat(lng),
     });
+    const updatedLocation = {
+        address,
+        lat: parseFloat(lat),
+        lng: parseFloat(lng),
+      };
+    
+      localStorage.setItem('savedLocation', JSON.stringify(updatedLocation));
     closeModal();
   };
 
